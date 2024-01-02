@@ -17,11 +17,17 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+// Fog
+// const fogColor = 0xff0000;
+// const fogDensity = 0.1;
+scene.fog = new THREE.FogExp2('#262837', 10)
+// scene.fog = fog
+
 /**
  * Water
  */
 // Geometry
-const waterGeometry = new THREE.PlaneGeometry(6, 6, 512, 512);
+const waterGeometry = new THREE.PlaneGeometry(10, 10, 512, 512);
 
 // Color
 debugObject.depthColor = "#186691";
@@ -32,6 +38,9 @@ const waterMaterial = new THREE.ShaderMaterial({
   vertexShader: waterVertexShader,
   fragmentShader: waterFragmentShader,
   uniforms: {
+    fogColor: { value: new THREE.Color('#262837') },
+    fogDensity: { value: 0.4 },
+
     uTime: { value: 0 },
 
     uBigWavesElevation: { value: 0.2 },
@@ -48,6 +57,11 @@ const waterMaterial = new THREE.ShaderMaterial({
     uColorOffset: { value: 0.08 },
     uColorMultiplier: { value: 1.5 },
   },
+  defines:
+    {
+        USE_FOG: '',
+        FOG_EXP2: '',
+    }
 });
 
 // Debug
@@ -179,6 +193,11 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
+controls.minDistance = 0.3;
+controls.maxDistance = 3;
+
+controls.maxPolarAngle = Math.PI / 2;
+
 /**
  * Renderer
  */
@@ -187,6 +206,13 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+debugObject.backgroundColor = '#14161f'
+renderer.setClearColor(debugObject.backgroundColor)
+gui.addColor(debugObject, 'backgroundColor')
+.onChange(() => {
+    renderer.setClearColor(debugObject.backgroundColor)
+})
 
 /**
  * Animate

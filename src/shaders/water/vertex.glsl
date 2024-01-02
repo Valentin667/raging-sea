@@ -95,12 +95,14 @@ float cnoise(vec3 P)
     return 2.2 * n_xyz;
 }
 
+#include <fog_pars_vertex>
+
 void main()
 {
   vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
   // Elevation
-  float elevation = sin(modelPosition.x * uBigWavesFrequency.x + uTime * uBigWavesSpeed) * 
+  float elevation = sin(modelPosition.x * uBigWavesFrequency.x + uTime *  uBigWavesSpeed) * 
                     sin(modelPosition.z * uBigWavesFrequency.y + uTime * uBigWavesSpeed) * 
                     uBigWavesElevation;
   
@@ -119,10 +121,12 @@ void main()
   modelPosition.y += elevation;
 
   vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 mvPosition = viewPosition;
   vec4 projectedPosition = projectionMatrix * viewPosition;
 
   gl_Position = projectedPosition;
 
   // Varyings
   vElevation = elevation;
+  #include <fog_vertex>
 }
